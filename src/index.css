@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.container-card {
+  display: grid;
+  grid-template-columns: repeat(5, 200px);
+  overflow-x: scroll;
+  gap: 15px;
+  margin-left: 15px;
+  margin-bottom: 40px;
+}
+
+
+
