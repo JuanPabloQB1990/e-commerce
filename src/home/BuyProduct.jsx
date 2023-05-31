@@ -5,6 +5,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import Modal from "react-modal";
 
 const BuyProduct = () => {
+
+  Modal.setAppElement("body");
   
   const { getProductBuy, getProductsToCart, editStockProduct, loadingProduct } =
     useContext(ProductContext);
@@ -27,6 +29,7 @@ const BuyProduct = () => {
 
   let date = new Date();
   
+  // funcion para calcular el resultado de todos los productos a comprar
   const sumTotalProducts = () => {
     let arrTotalProd = [];
     Products.map((prod) => {
@@ -47,11 +50,13 @@ const BuyProduct = () => {
     sumTotalProducts();
   }, [Products]);
 
+  // funccion  para editar el stock en firestore
   const productPay = async (modal) => {
     await editStockProduct(Products);
     modalHandler(modal);
   };
 
+  // funcion para abrir si el parametro es true y para cerrar si es false
   const modalHandler = (modal) => {
     if (modal) {
       setModalIsOpen(modal);
@@ -63,8 +68,7 @@ const BuyProduct = () => {
   };
 
   return (
-    <div>
-      <div className="max-w-[500px] h-auto mx-auto bg-white p-2">
+      <div className="max-w-[500px] h-auto mx-auto bg-white p-2 mt-4">
         <div>
           <p>
             Fecha: <span className="font-semibold">{date.toLocaleString()}</span>{" "}
@@ -146,7 +150,6 @@ const BuyProduct = () => {
           </div>
         </Modal>
       </div>
-    </div>
   );
 };
 

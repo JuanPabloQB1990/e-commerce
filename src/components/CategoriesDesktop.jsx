@@ -11,7 +11,7 @@ const CategoriesDesktop = () => {
         >
           <span className="material-symbols-outlined">phone_iphone</span>
 
-          <h3 className="font-semibold text-center">Celulares</h3>
+          <h3 className="font-semibold text-center text-base">Celulares</h3>
         </Link>
         <Link 
           to="/categories/computacion"
@@ -19,7 +19,7 @@ const CategoriesDesktop = () => {
         >
           <span className="material-symbols-outlined">computer</span>
 
-          <h3 className="font-semibold text-center">Computación</h3>
+          <h3 className="font-semibold text-center text-base">Computación</h3>
         </Link>
         <Link 
           to="/categories/electronica"
@@ -27,14 +27,14 @@ const CategoriesDesktop = () => {
         >
           <span className="material-symbols-outlined">keyboard_voice</span>
 
-          <h3 className="font-semibold text-center">Electrónica, Audio y Video</h3>
+          <h3 className="font-semibold text-center text-base">Electrónica, Audio y Video</h3>
         </Link>
         <Link 
           to="/categories/deporte"
           className="text-decoration no-underline text-black w-44 h-44 bg-white flex flex-col justify-center items-center gap-4"
         >
           <span className="material-symbols-outlined">sports_soccer</span>
-          <h3 className="font-semibold text-center">Deportes y Fitness</h3>
+          <h3 className="font-semibold text-center text-base">Deportes y Fitness</h3>
         </Link>
         <Link
           to="/categories/ropa"
@@ -42,7 +42,7 @@ const CategoriesDesktop = () => {
         >
           <span className="material-symbols-outlined">laundry</span>
 
-          <h3 className="font-semibold text-center">Ropa y Accesorios</h3>
+          <h3 className="font-semibold text-center text-base">Ropa y Accesorios</h3>
         </Link>
         <Link 
           to="/categories/videojuegos"
@@ -50,7 +50,7 @@ const CategoriesDesktop = () => {
         >
           <span className="material-symbols-outlined">stadia_controller</span>
 
-          <h3 className="font-semibold text-center">Consolas y Videojuegos</h3>
+          <h3 className="font-semibold text-center text-base">Consolas y Videojuegos</h3>
         </Link>
         <Link 
           to="/categories/hogarymuebles"
@@ -58,7 +58,7 @@ const CategoriesDesktop = () => {
         >
           <span className="material-symbols-outlined">chair</span>
 
-          <h3 className="font-semibold text-center">Hogar y Muebles</h3>
+          <h3 className="font-semibold text-center text-base">Hogar y Muebles</h3>
         </Link>
         <Link 
           to="/categories/vehiculos"
@@ -66,7 +66,7 @@ const CategoriesDesktop = () => {
         >
           <span className="material-symbols-outlined">directions_car</span>
 
-          <h3 className="font-semibold text-center">Carros, Motos y otros</h3>
+          <h3 className="font-semibold text-center text-base">Carros, Motos y otros</h3>
         </Link>
       </div>
     </div>

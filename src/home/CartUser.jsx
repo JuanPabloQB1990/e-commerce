@@ -3,13 +3,14 @@ import { ProductContext } from "../context/ProductProvider";
 import { Link, useNavigate } from "react-router-dom";
 
 const CartUser = () => {
-  console.log("render carrito");
+ 
   const { getProductsToCart, updateProductsTocart, deleteProductOfCart } =
     useContext(ProductContext);
   const [productsCart, setProductsCart] = useState([]);
   const [resultTotal, setResultTotal] = useState(0);
   const navigate = useNavigate();
 
+  // funcion para calcular el total de todos los productos
   const calculateProductsValue = () => {
     const productsOfCart = getProductsToCart();
     setProductsCart(productsOfCart);
@@ -30,23 +31,23 @@ const CartUser = () => {
   };
 
   useEffect(() => {
-    console.log("render productos de carrito");
     calculateProductsValue();
   }, []);
 
   // operacion para llevar el conteo de la cantidad de productos en el inventario y actualizar total
   const SelectedQuantityValue = (e) => {
     const { value, name } = e.target;
-    console.log("actualiza precio");
-    updateProductsTocart(name, value);
+    updateProductsTocart(name, value, true);
     calculateProductsValue();
   };
 
+  // funcion para eliminar producto del carrito
   const deleteProduct = (idProduct) => {
     deleteProductOfCart(idProduct);
     calculateProductsValue();
   };
 
+  // ir a la pagina de comprar
   const goToCart = () => {
     navigate("/buy-products/" + 2);
   };
@@ -55,7 +56,7 @@ const CartUser = () => {
   const prodCount = [];
   return (
     <div>
-      <div className="bg-white shadow-lg shadow-gray-500/50 w-full mb-44 mt-6 md:p-2 md:max-w-3xl md:rounded-md mx-auto">
+      <div className="m-4 bg-white rounded-md shadow-lg shadow-gray-500/50 w-11/12 sm:max-w-3xl mx-auto">
         <h2 className="font-bold p-2 border-b-2 capitalize text-2xl">
           Carrito de Compras
         </h2>
@@ -67,13 +68,13 @@ const CartUser = () => {
           }
           return (
             <div key={product.id} className="border-b-2 py-2">
-              <article className="flex justify-between py-2">
-                <div className="w-1/4">
+              <article className="flex justify-between py-4">
+                <div className="">
                   <Link to={`/product/${product.id}`}>
                     <img
                       src={product.photo}
                       alt=""
-                      className="h-full object-contain"
+                      className="w-40 h-40 object-contain mx-12"
                     />
                   </Link>
                 </div>
@@ -85,9 +86,9 @@ const CartUser = () => {
                     <p className="font-semibold pb-4">{product.name}</p>
                   </Link>
                   <div className="flex justify-between">
+                    {product.stock === 0 ? <p className="text-red-600 h-10 font-semibold bg-red-200 px-4 py-2 rounded">Agotado</p> : 
                     <div className="flex flex-col justify-around">
                       {" "}
-                      {/* cantidad */}
                       <span className="font-semibold flex gap-2">
                         <span>
                           cantidad:
@@ -106,7 +107,8 @@ const CartUser = () => {
                           </select>
                         </span>
                       </span>
-                    </div>
+                    </div>}
+                    
                     <div className="flex flex-col justify-end">
                       {" "}
                       {/* precios */}

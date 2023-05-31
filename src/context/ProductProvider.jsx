@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useState,
   createContext,
   useContext,
@@ -28,7 +27,7 @@ import { UserContext } from "./UserProvider";
 export const ProductContext = createContext();
 
 const ProductProvider = ({ children }) => {
-  console.log("ProductProvider");
+  
   const { userAuth } = useContext(UserContext);
 
   const [product, setProduct] = useState({});
@@ -39,14 +38,12 @@ const ProductProvider = ({ children }) => {
 
   // obtener de la base de datos firebase un solo producto en especifico
   const getProduct = async (id) => {
-    console.log("getProduct");
-    setLoadingProduct(true);
+    
     try {
       const docRef = doc(db, "products", id);
       const docSnap = await getDoc(docRef);
       setProduct({ ...docSnap.data(), id: docSnap.id });
       setImages(docSnap.data().photos);
-      setLoadingProduct(false);
     } catch (error) {
       console.log(error);
     }
@@ -54,7 +51,7 @@ const ProductProvider = ({ children }) => {
 
   // obtener lista de productos por usuario especifico
   const getProductsUser = async (idUser) => {
-    console.log("getProductUser");
+    
     try {
       const q = query(
         collection(db, "products"),
@@ -77,8 +74,7 @@ const ProductProvider = ({ children }) => {
 
   // obtener los productos por categorias especificas
   const getProductsCategoryList = async (name) => {
-    console.log("getProductsCategoryList");
-
+    
     try {
       const q = query(
         collection(db, "products"),
@@ -98,62 +94,108 @@ const ProductProvider = ({ children }) => {
 
   // crear productos
   const saveProduct = async (data, photos) => {
-    console.log("guardar productos");
 
-    setLoadingProduct(true);
-    let namePhotos = [];
-    for (let index = 0; index < photos.length; index++) {
-      const element = photos[index];
-      //guardar fotos en storage con el nombre
-      const storageRef = ref(
-        storage,
-        `products/${element.name + "-" + Date.now()}`
-      );
-      await uploadBytes(storageRef, element).then((snapshot) => {
-        console.log("Uploaded a blob or file!");
+    try {
+      setLoadingProduct(true);
+      let namePhotos = [];
+      for (let index = 0; index < photos.length; index++) {
+        const element = photos[index];
+  
+        //guardar fotos en storage con el nombre
+        const storageRef = ref(
+          storage,
+          `products/${element.name + "-" + Date.now()}`
+        );
+        await uploadBytes(storageRef, element).then((snapshot) => {
+          console.log("Uploaded a blob or file!");
+        });
+        const imageURL = await getDownloadURL(storageRef);
+        namePhotos.push(imageURL);
+      }
+  
+      const {
+        name_product,
+        description_product,
+        price_product,
+        category_product,
+        stock_product,
+        discount_product,
+      } = data;
+  
+      await addDoc(collection(db, "products"), {
+        name: name_product,
+        description: description_product,
+        price: price_product,
+        category: category_product,
+        stock: stock_product,
+        discount: discount_product,
+        id_user: userAuth.uid,
+        photos: namePhotos,
       });
-      const imageURL = await getDownloadURL(storageRef);
-      namePhotos.push(imageURL);
-      console.log(imageURL);
+  
+      setLoadingProduct(false);
+      
+    } catch (error) {
+      console.log(error);
     }
 
-    const {
-      name_product,
-      description_product,
-      price_product,
-      category_product,
-      stock_product,
-      discount_product,
-    } = data;
-
-    await addDoc(collection(db, "products"), {
-      name: name_product,
-      description: description_product,
-      price: price_product,
-      category: category_product,
-      stock: stock_product,
-      discount: discount_product,
-      id_user: userAuth.uid,
-      photos: namePhotos,
-    });
-
-    setLoadingProduct(false);
   };
 
+  // editar  productos
+  const editProduct = async(product) => {
+
+    try {
+      setLoadingProduct(true)
+  
+      const {
+        name_product,
+        description_product,
+        price_product,
+        category_product,
+        stock_product,
+        discount_product,
+      } = product;
+  
+      const productRef = doc(db, "products", id);
+  
+      await updateDoc(productRef, {
+        name: name_product,
+        description: description_product,
+        price: price_product,
+        category: category_product,
+        stock: stock_product,
+        discount: discount_product,
+      });
+  
+      setLoadingProduct(false)
+      
+    } catch (error) {
+      console.log(error);
+    }
+
+  }
+  
   // eliminar producto
-  const deleteProductList = async (productDelete) => {
-    console.log("eliminar producto");
-    setLoadingProduct(true);
-    for (let index = 0; index < productDelete.photos.length; index++) {
-      const desertRef = ref(storage, `products/${productDelete.photos[index]}`);
-      await deleteObject(desertRef);
-    }
-    await deleteDoc(doc(db, "products", productDelete.id));
-    setLoadingProduct(false);
-  };
+  const deleteProduct = async (productDelete) => {
 
+    try {
+      setLoadingProduct(true);
+      for (let index = 0; index < productDelete.photos.length; index++) {
+        const desertRef = ref(storage, `products/${productDelete.photos[index]}`);
+        await deleteObject(desertRef);
+      }
+      await deleteDoc(doc(db, "products", productDelete.id));
+      setLoadingProduct(false);
+      
+    } catch (error) {
+      console.log(error);
+    }
+    
+  };
+  
+  // agregar productos al carrito
   const addToCartProduct = async (productToCart, quantity) => {
-    console.log("agregar prod al carrito");
+    
     const productsArray = [];
     const photo = productToCart.photos[0];
     productsArray.push({
@@ -169,15 +211,11 @@ const ProductProvider = ({ children }) => {
       photo,
     });
 
-
-
-    if (!localStorage.getItem("productsToCart")) {
-      console.log("si no hay localStorage");
-      localStorage.setItem("productsToCart", JSON.stringify(productsArray));
+    if (!localStorage.getItem(userAuth.uid)) {
+      localStorage.setItem(userAuth.uid, JSON.stringify(productsArray));
     } else {
-      console.log("si hay localStorage");
       const productsLocalStorage = JSON.parse(
-        localStorage.getItem("productsToCart")
+        localStorage.getItem(userAuth.uid)
       );
 
       const prodExisting = productsLocalStorage.filter(
@@ -185,21 +223,19 @@ const ProductProvider = ({ children }) => {
       );
       
       if (prodExisting.length > 0) {
-        console.log("si hay un producto con el id indicado");
         const arrayeditado = productsLocalStorage.map((prod) =>
           prod.id === productToCart.id & prod.quantity + quantity <= prod.stock
             ? { ...prod, quantity: prod.quantity + quantity }
             : prod
         );
-        localStorage.removeItem("productsToCart");
-        localStorage.setItem("productsToCart", JSON.stringify(arrayeditado));
+        localStorage.removeItem(userAuth.uid);
+        localStorage.setItem(userAuth.uid, JSON.stringify(arrayeditado));
       } else {
-        console.log("no hay productos con el id");
         const productsLocalStorage = JSON.parse(
-          localStorage.getItem("productsToCart")
+          localStorage.getItem(userAuth.uid)
         );
         localStorage.setItem(
-          "productsToCart",
+          userAuth.uid,
           JSON.stringify([
             ...productsLocalStorage,
             { ...productToCart, quantity: quantity, photo: photo },
@@ -209,36 +245,53 @@ const ProductProvider = ({ children }) => {
     }
   };
 
+  //  obtener productos del carrito
   const getProductsToCart = () => {
-    console.log("getCarrito");
-    const productsOfCart = JSON.parse(localStorage.getItem("productsToCart"));
+    const productsOfCart = JSON.parse(localStorage.getItem(userAuth.uid));
     return productsOfCart;
   };
 
-  const updateProductsTocart = useCallback((id, value) => {
-    const productsOfCart = JSON.parse(localStorage.getItem("productsToCart"));
-    const productsEdited = productsOfCart.map((product) =>
-      product.id === id ? { ...product, quantity: value } : product
-    );
-    localStorage.removeItem("productsToCart");
-    localStorage.setItem("productsToCart", JSON.stringify(productsEdited));
-  }, []);
+  // actualizar productos del carrito
+  const updateProductsTocart = (id, value, bool) => {
+    const productsOfCart = JSON.parse(localStorage.getItem(userAuth.uid));
 
+    if (bool) {
+      const productsEdited = productsOfCart.map((product) =>
+        product.id === id ? { ...product, quantity: value } : product
+      );
+      
+      localStorage.removeItem(userAuth.uid);
+      localStorage.setItem(userAuth.uid, JSON.stringify(productsEdited));
+    } else {
+      
+      const productsEdited = productsOfCart.map((product) =>
+      product.id === id ? { ...product, stock: value } : product
+      );
+      
+      localStorage.removeItem(userAuth.uid);
+      localStorage.setItem(userAuth.uid, JSON.stringify(productsEdited));
+    }
+    
+  };
+
+  // eliminar productos del carrito
   const deleteProductOfCart = (idProduct) => {
-    console.log("eliminar prod del carrito");
+    
     console.log(idProduct);
-    const productsOfCart = JSON.parse(localStorage.getItem("productsToCart"));
+    const productsOfCart = JSON.parse(localStorage.getItem(userAuth.uid));
     const newProductsOfCart = productsOfCart.filter(
       (product) => product.id !== idProduct
     );
-    localStorage.removeItem("productsToCart");
-    localStorage.setItem("productsToCart", JSON.stringify(newProductsOfCart));
+    localStorage.removeItem(userAuth.uid);
+    localStorage.setItem(userAuth.uid, JSON.stringify(newProductsOfCart));
   };
 
+  // guardar en localStorage un  solo producto comprado
   const saveProductBuy = (product) => {
     localStorage.productBuy=JSON.stringify(product)
   }
   
+  //obtener un solo producto ccomprado
   const getProductBuy = () => {
     const product = JSON.parse(localStorage.productBuy)
     return product
@@ -246,19 +299,27 @@ const ProductProvider = ({ children }) => {
 
   // editar el stock de cada producto al vender
   const editStockProduct = async(products) => {
-    setLoadingProduct(true)
-    products.map(async prod => {
-      const docRef = await doc(db, "products", prod.id);
-      const docSnap = await getDoc(docRef);
-      console.log(docSnap.data());
+    console.log(products);
+    try {
+      setLoadingProduct(true)
+      products.map(async prod => {
+        const docRef = await doc(db, "products", prod.id);
+        const docSnap = await getDoc(docRef);
+        console.log(docSnap.data());
+        
+        await updateDoc(docRef, {
+          stock: docSnap.data().stock - prod.quantity,
+        });
+        
+        
+        updateProductsTocart(prod.id, docSnap.data().stock - prod.quantity, false )
+      })
+      localStorage.removeItem("productBuy");
+      setLoadingProduct(false)
       
-      updateDoc(docRef, {
-        stock: docSnap.data().stock - prod.quantity,
-      });
-
-    })
-
-    setLoadingProduct(false)
+    } catch (error) {
+      console.log(error);
+    }
 
   }
   
@@ -275,14 +336,15 @@ const ProductProvider = ({ children }) => {
         productsCategoryList,
         loadingProduct,
         saveProduct,
-        deleteProductList,
+        editProduct,
+        deleteProduct,
         addToCartProduct,
         getProductsToCart,
         updateProductsTocart,
         deleteProductOfCart,
         saveProductBuy,
         getProductBuy,
-        editStockProduct
+        editStockProduct,
       }}
     >
       {children}

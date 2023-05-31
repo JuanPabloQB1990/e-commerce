@@ -52,7 +52,7 @@ const UserProvider = ({ children }) => {
 
   // obtener usuario de sesion activa
   useEffect(() => {
-    console.log("obteniendo el usuario...");
+    
     onAuthStateChanged(auth, (user) => {
       if (user) {
         const { email, photoURL, displayName, uid } = user;

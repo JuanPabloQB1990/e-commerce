@@ -15,7 +15,7 @@ const initialProduct = {
 };
 
 const FormSell = () => {
-  console.log("render vender");
+  
   const { saveProduct, loadingProduct } = useContext(ProductContext);
   const { userAuth } = useContext(UserContext);
   const [formProduct, setFormProduct ] = useState(initialProduct);
@@ -58,7 +58,7 @@ const FormSell = () => {
   };
 
   return (
-    <div className="bg-gray-400 w-full h-full flex flex-col justify-center">
+    <div className="bg-gray-400 w-full h-screen flex flex-col justify-center">
       <div className="h-auto w-4/5 flex flex-col justify-center gap-4 m-auto md:w-96">
         <h2 className="font-medium text-2xl text-center">
           Ingresa un Producto

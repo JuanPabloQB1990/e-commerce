@@ -1,32 +1,28 @@
-import { doc, updateDoc } from "firebase/firestore";
 import { useForm } from "react-hook-form";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { ProductContext } from "../context/ProductProvider";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { db } from "../firebase";
 import { UserContext } from "../context/UserProvider";
 
 const FormEdit = () => {
   const { idProductEdit } = useParams();
-  const { product } = useContext(ProductContext);
+  const { product, editProduct } = useContext(ProductContext);
   const { userAuth } = useContext(UserContext);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (product.id_user !== userAuth.uid) {
-      console.log("diferente");
+      
       navigate("/*");
     }
   }, [idProductEdit]);
 
-  const { name, description, price, stock, discount, category, id } = product;
+  const { name, description, price, stock, discount, category } = product;
 
   const {
     register,
     handleSubmit,
-    watch,
-    setError,
     setValue,
     reset,
     formState: { errors },
@@ -51,26 +47,8 @@ const FormEdit = () => {
   }, [name]);
 
   const onSubmit = async (data) => {
-    console.log(data);
-    const {
-      name_product,
-      description_product,
-      price_product,
-      category_product,
-      stock_product,
-      discount_product,
-    } = data;
-
-    const productRef = doc(db, "products", id);
-
-    await updateDoc(productRef, {
-      name: name_product,
-      description: description_product,
-      price: price_product,
-      category: category_product,
-      stock: stock_product,
-      discount: discount_product,
-    });
+    
+    await editProduct(data)
 
     reset({
       name_product: "",
@@ -83,7 +61,7 @@ const FormEdit = () => {
 
     navigate(`/product/${idProductEdit}`);
   };
-  console.log("render formEdit");
+  
   return (
     <div className="bg-gray-400 w-full h-full flex flex-col justify-center">
       <div className="h-auto w-4/5 flex flex-col justify-center gap-4 m-auto md:w-96">

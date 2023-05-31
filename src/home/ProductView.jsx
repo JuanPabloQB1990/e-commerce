@@ -6,14 +6,14 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const ProductView = () => {
-  console.log("render product view");
+  
   const { userAuth } = useContext(UserContext);
   const {
     product,
     images,
     getProduct,
     loadingProduct,
-    deleteProductList,
+    deleteProduct,
     addToCartProduct,
     saveProductBuy,
   } = useContext(ProductContext);
@@ -27,8 +27,8 @@ const ProductView = () => {
   }, [id]);
 
   //funcion que lleva al formulario editar
-  const goToProduct = useCallback((idProduct) => {
-    getProduct(idProduct);
+  const goToProduct = useCallback(async(idProduct) => {
+    await getProduct(idProduct);
     navigate("/product-edit/" + idProduct);
   }, []);
 
@@ -45,22 +45,25 @@ const ProductView = () => {
     setSelectedQuantity(quantitySell);
   };
 
-  const deleteProduct = async (productDelete) => {
+  // funcccion para eliminar producto
+  const deleteProductUser = async (productDelete) => {
     const confirmatioDelete = confirm(
       "deseas eliminar este producto de tu lista?"
     );
     if (confirmatioDelete) {
-      await deleteProductList(productDelete);
+      await deleteProduct(productDelete);
       navigate("/products-user/" + userAuth.uid);
     }
   };
 
-  const buyProduct = (productToBuy) => {
+  // funcion para comprar producto
+  const buyProduct = async(productToBuy) => {
     const productOnlyBuy = [{ ...productToBuy, quantity: selectedQuantity }];
-    saveProductBuy(productOnlyBuy);
+    await saveProductBuy(productOnlyBuy);
     navigate("/buy-products/"+1);
   };
 
+  // funcion para agrega producto al carrito
   const addToCart = (productAdd) => {
     console.log(selectedQuantity);
     addToCartProduct(productAdd, selectedQuantity);
@@ -76,6 +79,7 @@ const ProductView = () => {
     </div>
   );
 
+  // funcion para cambiar la imagen ccon tocar
   useEffect(() => {
     let imageLinks = document.querySelectorAll(".image-link");
     let image = document.querySelector(".image");
@@ -91,6 +95,7 @@ const ProductView = () => {
     }
   });
 
+  // funcion para encapsular wl ancho de viewport
   window.addEventListener("resize", () => {
     setScreenWidth(window.innerWidth);
   });
@@ -169,7 +174,7 @@ const ProductView = () => {
                 {product.discount}% off
               </p>
             </div>
-
+            {product.stock ===  0 ?  <p className="text-red-600 h-10 w-[12ch] rounded font-semibold bg-red-200 px-4 py-2 ml-2">Agotado</p> : 
             <div className="mt-6">
               <div>
                 <p className="font-semibold text-base ml-4">Stock disponible</p>
@@ -194,7 +199,8 @@ const ProductView = () => {
                   <span>({product.stock} disponibles)</span>
                 </span>
               </div>
-            </div>
+            </div>}
+            
             <div className="m-2">
               {userAuth.uid !== product.id_user && (
                 <div>
@@ -242,7 +248,7 @@ const ProductView = () => {
                     </button>
                   ) : (
                     <button
-                      onClick={() => deleteProduct(product)}
+                      onClick={() => deleteProductUser(product)}
                       className="bg-red-600 block w-full py-2 px-4 font-bold text-white text-center rounded my-4 hover:bg-blue-400"
                     >
                       Eliminar
